@@ -14,7 +14,12 @@ export function middleware(request: NextRequest) {
   }
 
   // Get the token from the headers
-  const token = request.headers.get('Authorization')?.split(' ')[1];
+  // Prioritize X-AI-Toolkit-Token to support reverse proxies that use Authorization header
+  let token = request.headers.get('X-AI-Toolkit-Token');
+
+  if (!token) {
+    token = request.headers.get('Authorization')?.split(' ')[1];
+  }
 
   // allow public routes to pass through
   if (publicRoutes.some(route => request.nextUrl.pathname.startsWith(route))) {

@@ -98,14 +98,25 @@ function readNullTerminated(bytes: Uint8Array, start: number, encoding: number) 
 
 async function fetchBytes(src: string, start: number, endInclusive: number) {
   const wantLen = endInclusive - start + 1;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('AI_TOOLKIT_AUTH') : null;
+  const headers: HeadersInit = { Range: `bytes=${start}-${endInclusive}` };
+  if (token) {
+    (headers as any)['Authorization'] = `Bearer ${token}`;
+    (headers as any)['X-AI-Toolkit-Token'] = token;
+  }
 
   try {
-    const r = await fetch(src, { headers: { Range: `bytes=${start}-${endInclusive}` } });
+    const r = await fetch(src, { headers });
     if (!r.ok) throw new Error('range not ok');
     const buf = await r.arrayBuffer();
     return new Uint8Array(buf);
   } catch {
-    const r = await fetch(src);
+    const fallbackHeaders: HeadersInit = {};
+    if (token) {
+      (fallbackHeaders as any)['Authorization'] = `Bearer ${token}`;
+      (fallbackHeaders as any)['X-AI-Toolkit-Token'] = token;
+    }
+    const r = await fetch(src, { headers: fallbackHeaders });
     if (!r.ok) throw new Error('fetch not ok');
     const buf = await r.arrayBuffer();
     const u8 = new Uint8Array(buf);
