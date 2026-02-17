@@ -9,7 +9,6 @@ export const apiClient = axios.create();
 apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('AI_TOOLKIT_AUTH');
   if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
     // Add custom header for reverse proxy compatibility
     config.headers['X-AI-Toolkit-Token'] = token;
   }

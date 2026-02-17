@@ -101,7 +101,6 @@ async function fetchBytes(src: string, start: number, endInclusive: number) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('AI_TOOLKIT_AUTH') : null;
   const headers: HeadersInit = { Range: `bytes=${start}-${endInclusive}` };
   if (token) {
-    (headers as any)['Authorization'] = `Bearer ${token}`;
     (headers as any)['X-AI-Toolkit-Token'] = token;
   }
 
@@ -113,7 +112,6 @@ async function fetchBytes(src: string, start: number, endInclusive: number) {
   } catch {
     const fallbackHeaders: HeadersInit = {};
     if (token) {
-      (fallbackHeaders as any)['Authorization'] = `Bearer ${token}`;
       (fallbackHeaders as any)['X-AI-Toolkit-Token'] = token;
     }
     const r = await fetch(src, { headers: fallbackHeaders });
